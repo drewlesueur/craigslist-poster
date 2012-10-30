@@ -3,7 +3,7 @@
   var __slice = [].slice;
 
   chrome.browserAction.onClicked.addListener(function(tab) {
-    var agree_to_map, callbacker, check_east_valley, check_housing_offered, check_real_estate_by_broker, cl_home, create_tab, data_url, details, done_images, download_image, exec, fill_posting, get_listing_details, go_to_posting, ids, listing, nav, new_posting, next_step, steps, upload_image, wait_for_redirect;
+    var agree_to_map, callbacker, check_east_valley, check_housing_offered, check_real_estate_by_broker, cl_home, click_continue, create_tab, data_url, details, done_images, download_image, exec, fill_posting, get_listing_details, go_to_posting, ids, listing, nav, new_posting, next_step, steps, upload_image, wait_for_redirect;
     callbacker = function(fn) {
       return function() {
         var args;
@@ -178,7 +178,12 @@
         return $("form").eq(1).submit();
       });
     };
-    steps = [get_listing_details, download_image, create_tab, cl_home, go_to_posting, wait_for_redirect, check_housing_offered, check_real_estate_by_broker, check_east_valley, fill_posting, agree_to_map, upload_image, done_images];
+    click_continue = function() {
+      return exec(function() {
+        return $("button:contains(Continue)").click();
+      });
+    };
+    steps = [get_listing_details, download_image, create_tab, cl_home, go_to_posting, wait_for_redirect, check_housing_offered, check_real_estate_by_broker, check_east_valley, fill_posting, agree_to_map, upload_image, done_images, click_continue];
     next_step = function() {
       var step;
       step = steps.shift();

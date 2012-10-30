@@ -145,7 +145,6 @@ chrome.browserAction.onClicked.addListener (tab) ->
       r.onload = (e) ->
         if r.status == 200
           chrome.extension.sendMessage({method: "next_step"})
-      
 
     , data_url, ->
 
@@ -158,6 +157,11 @@ chrome.browserAction.onClicked.addListener (tab) ->
     console.log "done images"
     exec ->
       $("form").eq(1).submit() 
+
+  click_continue = ->
+    exec ->
+      $("button:contains(Continue)").click() 
+
 
   steps = [
     get_listing_details
@@ -173,6 +177,7 @@ chrome.browserAction.onClicked.addListener (tab) ->
     agree_to_map
     upload_image
     done_images
+    click_continue
   ]
 
   next_step = () ->
