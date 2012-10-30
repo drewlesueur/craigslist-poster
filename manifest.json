@@ -1,0 +1,17 @@
+{
+  "name": "Craigslist Poster",
+  "version": "1.0",
+  "manifest_version": 2,
+  "browser_action" : {
+    "default_icon": "cl.png"
+  },
+  "background": {
+    "persistent": true,
+    "scripts": ["underscore.js", "async.js", "extension.js"]
+  },
+  "permissions": [
+    "tabs",
+    "<all_urls>"
+  ]
+}
+
