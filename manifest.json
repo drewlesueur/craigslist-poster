@@ -7,7 +7,7 @@
   },
   "background": {
     "persistent": true,
-    "scripts": ["underscore.js", "async.js", "extension.js"]
+    "scripts": ["underscore.js", "async.js", "extension_helper.js", "extension.js"]
   },
   "permissions": [
     "tabs",
