@@ -1,7 +1,7 @@
 ads = [
-  "Get a list of homes for sale in Mesa 85212"
-  "Custom Search Homes in Gilbert 85295"
-  "Beautiful Gilbert Homes in Gilbert 85234"
+  # "Get a list of homes for sale in Mesa 85212"
+  # "Custom Search Homes in Gilbert 85295"
+  # "Beautiful Gilbert Homes in Gilbert 85234"
   "Free MLS Report for San Tan Valley 85140"
   "Homes for sale in Queen Creek 85142"
   "Search MLS Data for Gilbert 85298"
@@ -19,7 +19,6 @@ ads = [
   "Find your next home! Free Search in Mesa 85204"
 ]
 
-[ad, zip, max_price] = []
 
 posting_steps = [
   select_homeseekr_tab
@@ -39,8 +38,8 @@ posting_steps = [
   fill_posting
   agree_to_map
   # upload_image # this works
-  # done_images
-  # click_continue
+  done_images
+  click_continue
   do_next_posting
 ]
 

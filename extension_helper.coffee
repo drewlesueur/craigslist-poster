@@ -1,13 +1,11 @@
 get_next_ad = null
 next_step = null
 
-toggler = (list) ->
+nexter = (list) ->
   togglerIndex = 0
   ->
     ret = list[togglerIndex]
     togglerIndex += 1
-    if togglerIndex == list.length
-      togglerIndex = 0
     ret
 
 debug = false
@@ -22,7 +20,7 @@ stepper = (steps) ->
     console.log "calling next step: #{message}"
     step?()
 
-setup_ad_cycle = -> get_next_ad = toggler ads
+setup_ad_cycle = -> get_next_ad = nexter ads
 
 start_posting = ->
   setup_ad_cycle()
@@ -32,8 +30,17 @@ do_posting = () ->
   next_step = stepper posting_steps
   next_step("do posting")
 
+two_hours = 7200000
+fifteen_min = 900000 
+
+give_or_take_15 = ->
+  _.random -fifteen_min, fifteen_min
+
+two_minutes = 120000
+
 do_next_posting = ->
-  wait 1000, ->
+  wait two_hours + give_or_take_15(), ->
+  # wait two_minutes, ->
     do_posting()
   
 wait_for = (condition, args, callback) ->
@@ -58,9 +65,6 @@ wait_for = (condition, args, callback) ->
         console.log "going to try again"
   try_it()
     
-
-
-
 
 callbacker = (fn) ->
   (args...) ->
@@ -188,7 +192,7 @@ fill_posting = ->
     $("span:contains(Posting Title:)").nextAll('input').val(ad)
     $("span:contains(SqFt)").nextAll('input').val(details.BuildingAreaTotal)
     $("span:contains(Posting Description:)").nextAll('textarea').val """
-      <img src="http://homeseekr.com/cached_image/image?zip=#{zip}&max_price=#{max_price}&page=1">
+      <a href="http://homeseekr.com/##{zip}/#{max_price}/1"><img src="http://homeseekr.com:8502/cached_image?zip=#{zip}&max_price=#{max_price}&page=1"></a>
       #{details.PublicRemarks}
     """
 
@@ -202,6 +206,7 @@ fill_posting = ->
 
 ad = ""
 zip = ""
+max_price = ""
 
 search_for_next_ad = ->
   console.log "search for next ad"
