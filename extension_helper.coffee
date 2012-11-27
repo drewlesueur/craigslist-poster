@@ -1,12 +1,4 @@
-get_next_ad = null
 next_step = null
-
-nexter = (list) ->
-  togglerIndex = 0
-  ->
-    ret = list[togglerIndex]
-    togglerIndex += 1
-    ret
 
 debug = false
 debug_on = -> debug = true
@@ -20,10 +12,8 @@ stepper = (steps) ->
     console.log "calling next step: #{message}"
     step?()
 
-setup_ad_cycle = -> get_next_ad = nexter ads
 
 start_posting = ->
-  setup_ad_cycle()
   do_posting()
 
 do_posting = () ->
@@ -31,6 +21,7 @@ do_posting = () ->
   next_step("do posting")
 
 two_hours = 7200000
+one_hour = 3600000
 fifteen_min = 900000 
 
 give_or_take_15 = ->
@@ -39,7 +30,7 @@ give_or_take_15 = ->
 two_minutes = 120000
 
 do_next_posting = ->
-  wait two_hours + give_or_take_15(), ->
+  wait one_hour + give_or_take_15(), ->
   # wait two_minutes, ->
     do_posting()
   
@@ -56,7 +47,7 @@ wait_for = (condition, args, callback) ->
     exec_with_args condition, args, (err, results) ->
       console.log console.log JSON.stringify results
       
-      if results[0]
+      if results?[0]
         console.log "pass"
         callback(null, results[0])
       else
@@ -186,35 +177,40 @@ check_east_valley = ->
   , -> wait_for_nav()
 
 fill_posting = ->
-  exec (details, ad, zip, max_price) ->
+  exec (details, zip, max_price) ->
+    first_6_words = details.PublicRemarks.split(" ").slice(0,6).join(" ")
+    ad = "#{details.City} #{zip} - #{first_6_words}..."
     $("span:contains(Price:)").nextAll('input').val(details.ListPrice)
     $("span:contains(# BR:)").nextAll('select').val(details.BedsTotal)
     $("span:contains(Posting Title:)").nextAll('input').val(ad)
     $("span:contains(SqFt)").nextAll('input').val(details.BuildingAreaTotal)
     $("span:contains(Posting Description:)").nextAll('textarea').val """
-      <a href="http://homeseekr.com/##{zip}/#{max_price}/1"><img src="http://homeseekr.com:8502/cached_image?zip=#{zip}&max_price=#{max_price}&page=1"></a>
+      <a href="http://homeseekr.com/##{zip}/#{max_price}/1"><img src="http://homeseekr.com/cached_image?zip=#{zip}&max_price=#{max_price}&page=1"></a>
+      <br />
       #{details.PublicRemarks}
     """
 
-    $("span:contains(Specific Location:)").nextAll('input').val(details.UnparsedAddress)
+    $("span:contains(Specific Location:)").nextAll('input').val(details.City + " " + zip)
     $("span:contains(Street:)").nextAll('input').first().val("#{details.StreetNumber} #{details.StreetDirPrefix} #{details.StreetName}")
     $("span:contains(City:)").nextAll('input').first().val(details.City)
     $("#region").val(details.StateOrProvince)
     $("#postal_code").val(details.PostalCode)
     $('form').submit()
-  , details, ad, zip, max_price, -> wait_for_nav()
+  , details, zip, max_price, -> wait_for_nav()
 
-ad = ""
 zip = ""
 max_price = ""
 
+random_item = (list) ->
+  rand = _.random 0, list.length - 1
+  list[rand]
+
+get_random_zip_price = ->
+  zip = random_item(zips)
+  max_price = random_item(max_prices) * 1000
+
 search_for_next_ad = ->
-  console.log "search for next ad"
-  ad = get_next_ad()
-  console.log "ad is", ad
-  zip = ad.match(/\d{5}/)[0]
-  console.log "zip"
-  max_price = 200000
+  get_random_zip_price()
   exec (max_price, zip) -> 
     window.location = "##{zip}/#{max_price}/1"
   , max_price, zip, ->
@@ -227,7 +223,11 @@ wait_til_ad_finishes_loading = ->
   console.log "waiting til add finishes loading"
   wait_for ->
     return $(".listing").length
-  , [], (err)-> next_step("wait til ad finishes loading")
+  , [], (err)-> 
+    if err
+      wait 2000, do_posting
+    else
+      next_step("wait til ad finishes loading")
 
 listing = {}
 details = {}
@@ -236,10 +236,14 @@ get_listing_details = ->
   exec ->
     $(".listing").first().find("script").html()
   , (err, json) ->
-    listing = JSON.parse(json[0])
-    details = listing.StandardFields
-    console.log "json is", details
-    next_step("get listing details")
+    if !err
+      listing = JSON.parse(json[0])
+      details = listing.StandardFields
+      console.log "json is", details
+      next_step("get listing details")
+    else
+      console.log("no results found. Moving on")
+      do_posting()
 
 agree_to_map = () ->
   exec ->
